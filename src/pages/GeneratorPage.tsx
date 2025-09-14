@@ -349,7 +349,7 @@ export default function GeneratorPage() {
           <Card title="Archivos generados" bordered={false} style={{ minHeight: 400, borderRadius: 8 }}>
             {generated.length === 0 ? (
               <div style={{ textAlign: "center", marginTop: 50 }}>
-                <img src="../../public/folder-open-icon.png" alt="placeholder" style={{ maxWidth: "10%" }} />
+                <img src="/folder-open-icon.png" alt="placeholder" style={{ maxWidth: "10%" }} />
                 <Text type="secondary" style={{ display: "block", marginTop: 12 }}>Sin archivos por ahora</Text>
               </div>
             ) : (
