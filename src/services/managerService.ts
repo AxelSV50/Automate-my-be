@@ -1,10 +1,8 @@
-// src/services/managerService.ts
 import type { GeneratorData } from "../types/dtos";
 import managerTemplate from "../templates/manager.vb.tmpl?raw";
 import { sanitizeIdentifier } from "./vbHelpers";
 
-// Exporta la función pública
-export function generateManagerFile(data: GeneratorData): { filename: string; content: string } {
+export function generateManagerFile(data: GeneratorData): { filename: string; content: string; description: string } {
   const tableName = data.tableName;
   const className = sanitizeIdentifier("T" + tableName.replace(/\s+/g, ""));
   const cols = data.attributes.map(a => ({ ...a, columnName: a.columnName ?? a.name }));
@@ -110,8 +108,11 @@ ${whereLines ? whereLines + "\n" : ""}        If _Query.Open Then
     .replace("{{RECORD_LOAD_LINES}}", recordLoadLines)
     .replace("{{GET_NEXT_IDENTITY}}", getNextIdentitySnippet);
 
+    const description = "Clase de DAL que se comunica con la Base de Datos. Colocar archivo en proyecto "+ "'"+data.category+ "'.";
+
   return {
     filename: `${className}.vb`,
-    content
+    content,
+    description
   };
 }

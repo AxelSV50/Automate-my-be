@@ -103,7 +103,7 @@ export default function GeneratorPage() {
     };
 
     setAttributes([...updated, newAttr]);
-    // reset
+
     setNewAttrName("");
     setNewAttrType(COMMON_SQL_TYPES[0]);
     setNewIsPrimary(false);
@@ -127,10 +127,8 @@ export default function GeneratorPage() {
       if (!target) return prev;
       const willBe = !target.isIdentity;
       if (willBe) {
-        // activate this one, deactivate others
         return prev.map(a => (a.id === id ? { ...a, isIdentity: true } : { ...a, isIdentity: false }));
       } else {
-        // just deactivate this one
         return prev.map(a => (a.id === id ? { ...a, isIdentity: false } : a));
       }
     });
@@ -148,14 +146,14 @@ export default function GeneratorPage() {
       return;
     }
 
-    // Validate identity uniqueness (extra safety)
+    // Validate identity uniqueness
     const identityCount = attributes.filter(a => a.isIdentity).length;
     if (identityCount > 1) {
       toast.error("Sólo puede haber una columna marcada como Identity. Desmarca las demás.");
       return;
     }
 
-    // Validate duplicates (should be already prevented, but double-check)
+    // Validate duplicates
     const names = attributes.map(a => a.name.toLowerCase());
     const dup = names.some((v, i) => names.indexOf(v) !== i);
     if (dup) {
@@ -175,7 +173,6 @@ export default function GeneratorPage() {
     try {
       const files = await generateFiles(payload);
       setGenerated(files);
-      // reset expanded map
       const map: Record<string, boolean> = {};
       files.forEach(f => (map[f.filename] = false));
       setExpandedMap(map);
@@ -202,7 +199,7 @@ export default function GeneratorPage() {
     }
   };
 
-  /* ---------- Download helper (same as before) ---------- */
+  /* ---------- Download helper  ---------- */
   function downloadFile(filename: string, content: string) {
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -385,7 +382,6 @@ export default function GeneratorPage() {
                     >
                       <List.Item.Meta
                         title={
-                          // clickable container for toggling expand/collapse - appearance unchanged
                           <div
                             onClick={() => toggleExpanded(f.filename)}
                             style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
@@ -399,11 +395,9 @@ export default function GeneratorPage() {
                           </div>
                         }
                         description={
-                          // Hidden by default; expands when user clicks the title
                           <div style={{ marginTop: 15 }}>
                             {isExpanded && (
                               <>
-                                {/* Optional description (non-editable). You can inject f.description from the generator */}
                                 {f.description && (
                                   <p style={{ color: "#a8a8a8ff", marginBottom: 12 }}>
                                     {f.description}

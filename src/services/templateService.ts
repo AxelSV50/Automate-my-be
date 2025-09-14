@@ -9,6 +9,7 @@ export type GeneratedUnit = {
   filename: string;
   content: string;
   title?: string; 
+  description?: string; 
 };
 export async function generateFiles(data: GeneratorData): Promise<Array<GeneratedUnit>> {
   const entityFile = generateEntityFile(data);

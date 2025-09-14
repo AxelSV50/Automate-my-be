@@ -2,15 +2,9 @@ import type { GeneratorData } from "../types/dtos";
 import tmpl from "../templates/wcfImplementation.vb.tmpl?raw";
 import { mapSqlTypeToVBType, sanitizeIdentifier } from "./vbHelpers";
 
-/**
- * Genera el fragmento WCF implementation (llama a la clase seleccionada p.ej. TCatalogo o TBancos).
- * Devuelve { title, filename, content }.
- *
- * Usa data.category (opcional) para elegir la clase que se instancia y se invoca.
- */
-export function generateWcfImplementationFragment(data: GeneratorData): { title: string; filename: string; content: string } {
+export function generateWcfImplementationFragment(data: GeneratorData): { title: string; filename: string; content: string; description: string } {
   const rawTable = data.tableName ?? "MyTable";
-  const varName = rawTable; // mantiene underscore (ej. Codigo_Accion)
+  const varName = rawTable; 
 
   // CLASS_BASE en Pascal (CodigoAccion)
   const classBase = rawTable
@@ -39,10 +33,9 @@ export function generateWcfImplementationFragment(data: GeneratorData): { title:
   // Determine selected category/class to call. Default to "Catalogo"
   const rawCategory = (data.category ?? "Catalogo").toString();
   const selectedBase = rawCategory.replace(/^T/i, "").replace(/\.vb$/i, "").replace(/[^A-Za-z0-9]/g, "");
-  const callerVar = selectedBase || "Catalogo";        // e.g. "Catalogo" or "Bancos"
-  const callerClass = `T${selectedBase || "Catalogo"}`; // e.g. "TCatalogo" or "TBancos"
+  const callerVar = selectedBase || "Catalogo";        
+  const callerClass = `T${selectedBase || "Catalogo"}`; 
 
-  // Build content replacing template tokens
   let content = tmpl
     .replace(/{{VAR_NAME}}/g, varName)
     .replace(/{{CLASS_BASE}}/g, classBase)
@@ -56,8 +49,9 @@ export function generateWcfImplementationFragment(data: GeneratorData): { title:
   const reTCatalogo = /\bTCatalogo\b/g;
   content = content.replace(reTCatalogo, callerClass).replace(reCatalogo, callerVar);
 
-  const filename = `${sanitizeIdentifier(rawTable)}_WCFImpl.txt`;
+  const filename = `${sanitizeIdentifier(rawTable)}_ImplWCF.txt`;
   const title = `Fragmento WCF Implementation - ${classBase}`;
+  const description = "Fragmento de código que expone los endpoints en la capa de presentación. Pegar en 'ServiciosWCF/WCF"+data.category+ "'.";
 
-  return { title, filename, content };
+  return { title, filename, content, description};
 }

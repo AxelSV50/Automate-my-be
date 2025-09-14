@@ -7,7 +7,7 @@ import {
 import entityTemplate from "../templates/entity.vb.tmpl?raw";
 import type { GeneratorData } from "../types/dtos";
 
-export function generateEntityFile(data: GeneratorData): { filename: string; content: string } {
+export function generateEntityFile(data: GeneratorData): { filename: string; content: string, description: string } {
   const tableName = sanitizeIdentifier(data.tableName);
   const className = `TReg${tableName}`;
   const attrs = data.attributes.map(a => ({ ...a }));
@@ -50,8 +50,11 @@ export function generateEntityFile(data: GeneratorData): { filename: string; con
     .replace("{{PROPERTIES}}", PROPERTIES)
     .replace("{{INITIALIZATIONS}}", INITIALIZATIONS);
 
+  const description = "Entidad que representa a la tabla SQL en el backend. Colocar archivo en 'AccesoTablas/" + data.category+"'.";
+
   return {
     filename: `${className}.vb`,
-    content
+    content,
+    description
   };
 }
