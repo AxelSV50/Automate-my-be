@@ -1,4 +1,3 @@
-// src/pages/GeneratorPage.tsx
 import { useState } from "react";
 import {
   Button,
@@ -16,12 +15,8 @@ import {
 import { DeleteOutlined, PlusOutlined, DownloadOutlined, CopyOutlined } from "@ant-design/icons";
 import type { Attribute, GeneratorData } from "../types/dtos";
 import { generateFiles } from "../services/templateService";
-
-// Toastify
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// Syntax highlighter
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -75,9 +70,7 @@ export default function GeneratorPage() {
   const [newIsPrimary, setNewIsPrimary] = useState<boolean>(false);
   const [newIsIdentity, setNewIsIdentity] = useState<boolean>(false);
   const [generated, setGenerated] = useState<GeneratedUnit[]>([]);
-  const [category, setCategory] = useState<string>(CATEGORIES[0] ?? "Catalogo"); // default: Catalogo
-
-  // expand state for each generated unit (key by filename)
+  const [category, setCategory] = useState<string>(CATEGORIES[0] ?? "Catalogo");
   const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
 
   /* ---------- Add attribute with validations ---------- */
