@@ -1,0 +1,77 @@
+#Region "Metodos de {{CLASS_BASE}}"
+
+    Public Function {{CLASS_BASE}}_Insert(ByVal pConexion As String, ByVal pDatos As {{REG_CLASS_NAME}}) As String
+        Dim Result As String = ""
+        If ValidarConexion(pConexion) Then
+            Dim {{VAR_NAME}} As New T{{CLASS_BASE}}(_Transaccion.Conexion)
+            {{VAR_NAME}}.Col = pDatos
+            If Not {{VAR_NAME}}.Insert Then
+                Result = {{VAR_NAME}}.MSG_Error
+            End If
+        Else
+            Result = "Conexion invalid!"
+        End If
+        _Transaccion.Conexion.Close()
+        Return Result
+    End Function
+
+    Public Function {{CLASS_BASE}}_Update(ByVal pConexion As String, ByVal pDatos As {{REG_CLASS_NAME}}) As String
+        Dim Result As String = ""
+        If ValidarConexion(pConexion) Then
+            Dim {{VAR_NAME}} As New T{{CLASS_BASE}}(_Transaccion.Conexion)
+            {{VAR_NAME}}.Col = pDatos
+            If Not {{VAR_NAME}}.Modify Then
+                Result = {{VAR_NAME}}.MSG_Error
+            End If
+        Else
+            Result = "Conexion invalid!"
+        End If
+        _Transaccion.Conexion.Close()
+        Return Result
+    End Function
+
+    Public Function {{CLASS_BASE}}_Delete(ByVal pConexion As String{{PK_PARAMS_SIGNATURE}}) As String
+        Dim Result As String = ""
+        If ValidarConexion(pConexion) Then
+            Dim {{VAR_NAME}} As New T{{CLASS_BASE}}(_Transaccion.Conexion)
+{{PK_ASSIGNMENTS_VAR}}
+            If Not {{VAR_NAME}}.Remove Then
+                Result = {{VAR_NAME}}.MSG_Error
+            End If
+        Else
+            Result = "Conexion invalid!"
+        End If
+        _Transaccion.Conexion.Close()
+        Return Result
+    End Function
+
+    Public Function {{CLASS_BASE}}_ListKey(ByVal pConexion As String{{PK_PARAMS_SIGNATURE}}) As {{REG_CLASS_NAME}}
+        Dim Result As {{REG_CLASS_NAME}} = Nothing
+        If ValidarConexion(pConexion) Then
+            Dim {{VAR_NAME}} As New T{{CLASS_BASE}}(_Transaccion.Conexion)
+{{PK_ASSIGNMENTS_VAR}}
+            If {{VAR_NAME}}.ListKey Then
+                Result = {{VAR_NAME}}.Col
+            End If
+        End If
+        _Transaccion.Conexion.Close()
+        Return Result
+    End Function
+
+    Public Function {{CLASS_BASE}}_List(ByVal pConexion As String, ByVal pParam As ParamFilter) As DataSet
+        Dim Result As DataSet = Nothing
+        If ValidarConexion(pConexion) Then
+            Dim {{VAR_NAME}} As New T{{CLASS_BASE}}(_Transaccion.Conexion)
+            If {{VAR_NAME}}.List(pParam) Then
+                Result = {{VAR_NAME}}.Data
+            Else
+                Result = GenereDSError({{VAR_NAME}}.MSG_Error)
+            End If
+        Else
+            Result = GenereDSError("Conexion invalid!")
+        End If
+        _Transaccion.Conexion.Close()
+        Return Result
+    End Function
+
+#End Region

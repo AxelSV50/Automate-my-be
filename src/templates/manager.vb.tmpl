@@ -1,0 +1,186 @@
+' ------------------------------------------------------------------------
+' AUTO-GENERATED: Manager class for table {{TABLE_NAME}}
+' NOTE: This file was generated automatically. Customize the behavior below
+' by editing the commented sections marked "CUSTOMIZE" if needed.
+' Example: change mapping rules, additional where clauses, logging, etc.
+' ------------------------------------------------------------------------
+
+Imports LD.AccesoDatos
+Imports LD.AccesoTablas
+Imports LD.MENSAJES
+
+Public Class {{CLASS_NAME}}
+    Inherits TManagerTable
+
+#Region "Definicion Variables Locales"
+{{VARIABLES}}
+#End Region
+
+#Region "Definicion  Constructor"
+    Public Sub New(ByVal pConexion As Acceso_Generico)
+        MyBase.New(pConexion)
+{{CONSTRUCTOR_INITS}}
+    End Sub
+#End Region
+
+#Region "Definicion Propiedades"
+{{PROPERTIES}}
+#End Region
+
+#Region "Definicion metodos publicos"
+
+#Region "Definicion metodos publicos heredados"
+    Public Overrides Function Insert() As Boolean
+        Try
+            Dim _Insert As New TInsert(_Transaccion.Conexion)
+            _Insert.Table = "{{TABLE_NAME}}"
+{{INSERT_LINES}}
+            If _Insert.Execute Then
+                Return True
+            Else
+                Save_Msg(Me, _Insert.MSG_Error, "Insert")
+                _MsgError = _Insert.MSG_Error
+                Return False
+            End If
+        Catch ex As Exception
+            Save_Msg(Me, ex.Message, "Insert")
+            _MsgError = ex.Message
+            Return False
+        End Try
+    End Function
+
+    Public Overrides Function Modify() As Boolean
+        Try
+            Dim _Update As New TUpdate(_Transaccion.Conexion)
+            _Update.Table = "{{TABLE_NAME}}"
+{{UPDATE_SET_LINES}}
+{{WHERE_PK_LINES_UPDATE}}
+            If _Update.Execute Then
+                Return True
+            Else
+                Save_Msg(Me, _Update.MSG_Error, "Update")
+                _MsgError = _Update.MSG_Error
+                Return False
+            End If
+        Catch ex As Exception
+            Save_Msg(Me, ex.Message, "Update")
+            _MsgError = ex.Message
+            Return False
+        End Try
+    End Function
+
+    Public Overrides Function Remove() As Boolean
+        Try
+            Dim _Delete As New TDelete(_Transaccion.Conexion)
+            _Delete.Table = "{{TABLE_NAME}}"
+{{WHERE_PK_LINES_DELETE}}
+            If _Delete.Execute Then
+                Return True
+            Else
+                Save_Msg(Me, _Delete.MSG_Error, "Remove")
+                _MsgError = _Delete.MSG_Error
+                Return False
+            End If
+        Catch ex As Exception
+            Save_Msg(Me, ex.Message, "Remove")
+            _MsgError = ex.Message
+            Return False
+        End Try
+    End Function
+
+    Public Overrides Function ListKey() As Boolean
+        Try
+            Dim _Query As New TQuery(_Transaccion.Conexion)
+{{SELECT_LISTKEY_FIELDS}}
+            _Query.From(New TFrom("{{TABLE_NAME}}", "A"))
+{{WHERE_PK_LINES_LISTKEY}}
+            If _Query.Open Then
+                If _Query.RowCount > 0 Then
+                    _Eof = False
+                    Clear()
+                    _Data.Tables.Add(_Query.Data)
+                    Record_Load()
+                    Return True
+                Else
+                    _Eof = True
+                    _MsgError = "No hay datos"
+                    _Cols.Initialize()
+                    Return False
+                End If
+            Else
+                Save_Msg(Me, _Query.MSG_Error, "ListKey")
+                _MsgError = _Query.MSG_Error
+                Return False
+            End If
+        Catch ex As Exception
+            Save_Msg(Me, ex.Message, "ListKey")
+            _MsgError = ex.Message
+            Return False
+        End Try
+    End Function
+
+    Public Overrides Function List(ByVal Param As ParamFilter) As Boolean
+        Try
+            Dim _Query As New TQuery(_Transaccion.Conexion)
+{{SELECT_LIST_FIELDS}}
+            _Query.From(New TFrom("{{TABLE_NAME}}", "A"))
+{{LIST_WHERE_EXAMPLE}}
+            _Query.OrdenBy(New TField("A", "{{DEFAULT_ORDER_FIELD}}"), TipoOrden.Ascendente)
+            If _Query.Open Then
+                _Eof = Not _Query.RowCount > 0
+                Clear()
+                _Data.Tables.Add(_Query.Data)
+                _MsgError = ""
+                _Cols.Initialize()
+                Return True
+            Else
+                Save_Msg(Me, _Query.MSG_Error, "List")
+                _MsgError = _Query.MSG_Error
+                Return False
+            End If
+        Catch ex As Exception
+            Save_Msg(Me, ex.Message, "List")
+            _MsgError = ex.Message
+            Return False
+        End Try
+    End Function
+#End Region
+
+#Region "Definicion de Otros metodos publicos"
+
+#End Region
+
+#End Region
+
+#Region "Definicion metodos Privados"
+
+#Region "Definicion metodos Privados heredados"
+    Protected Overrides Sub Record_Load()
+        _Cols.Initialize()
+        With _Data.Tables(0).Rows(0)
+{{RECORD_LOAD_LINES}}
+        End With
+    End Sub
+
+    Protected Overrides Function GetNext_Identity() As Long
+{{GET_NEXT_IDENTITY}}
+    End Function
+
+#End Region
+
+#Region "Definicion de Otros metodos Privados"
+
+#End Region
+
+#End Region
+
+End Class
+
+' ------------------------------
+' CUSTOMIZE: If you need special behavior (e.g. different mapping or composite PK logic),
+' you can edit the sections above. Examples:
+'
+'  - To change the mapping for a specific DB type, replace calls to MapSqlToVb in this file.
+'  - If your identity generator requires transactions or sequence tables, update GetNext_Identity.
+'  - If you want different ordering in List(), change DEFAULT_ORDER_FIELD token or the OrdenBy call.
+' ------------------------------

@@ -1,0 +1,26 @@
+#Region "Metodos de {{VAR_NAME}}"
+    Public Function {{VAR_NAME}}_Insert(ByVal pConexion As String, ByVal pDatos As {{REG_CLASS_NAME}}) As String Implements IWCFCatalogo.{{VAR_NAME}}_Insert
+        Dim Catalogo As New TCatalogo
+        Return Catalogo.{{CLASS_BASE}}_Insert(pConexion, pDatos)
+    End Function
+
+    Public Function {{VAR_NAME}}_Update(ByVal pConexion As String, ByVal pDatos As {{REG_CLASS_NAME}}) As String Implements IWCFCatalogo.{{VAR_NAME}}_Update
+        Dim Catalogo As New TCatalogo
+        Return Catalogo.{{CLASS_BASE}}_Update(pConexion, pDatos)
+    End Function
+
+    Public Function {{VAR_NAME}}_Delete(ByVal pConexion As String{{PK_PARAMS_SIGNATURE}}) As String Implements IWCFCatalogo.{{VAR_NAME}}_Delete
+        Dim Catalogo As New TCatalogo
+        Return Catalogo.{{CLASS_BASE}}_Delete(pConexion{{PK_ARGS_LIST}})
+    End Function
+
+    Public Function {{VAR_NAME}}_ListKey(ByVal pConexion As String{{PK_PARAMS_SIGNATURE}}) As {{REG_CLASS_NAME}} Implements IWCFCatalogo.{{VAR_NAME}}_ListKey
+        Dim Catalogo As New TCatalogo
+        Return Catalogo.{{CLASS_BASE}}_ListKey(pConexion{{PK_ARGS_LIST}})
+    End Function
+
+    Public Function {{VAR_NAME}}_List(ByVal pConexion As String, ByVal pParam As ParamFilter) As DataSet Implements IWCFCatalogo.{{VAR_NAME}}_List
+        Dim Catalogo As New TCatalogo
+        Return Catalogo.{{CLASS_BASE}}_List(pConexion, pParam)
+    End Function
+#End Region

@@ -1,0 +1,21 @@
+Public Class {{TableName}}
+
+#Region "Definicion Variables Locales"
+{{VARIABLES}}
+#End Region
+
+#Region "Definicion de propiedades"
+{{PROPERTIES}}
+#End Region
+
+#Region "Definicion de metodos Publicos"
+    Public Sub New()
+        Initialize()
+    End Sub
+
+    Public Sub Initialize()
+{{INITIALIZATIONS}}
+    End Sub
+#End Region
+
+End Class

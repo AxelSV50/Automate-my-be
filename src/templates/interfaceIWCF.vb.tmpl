@@ -1,0 +1,14 @@
+#Region "Metodos de {{VAR_NAME}}"
+
+    <OperationContract()>
+    Function {{VAR_NAME}}_Insert(ByVal pConexion As String, ByVal pDatos As {{REG_CLASS_NAME}}) As String
+    <OperationContract()>
+    Function {{VAR_NAME}}_Update(ByVal pConexion As String, ByVal pDatos As {{REG_CLASS_NAME}}) As String
+    <OperationContract()>
+    Function {{VAR_NAME}}_Delete(ByVal pConexion As String{{PK_PARAMS_SIGNATURE}}) As String
+    <OperationContract()>
+    Function {{VAR_NAME}}_ListKey(ByVal pConexion As String{{PK_PARAMS_SIGNATURE}}) As {{REG_CLASS_NAME}}
+    <OperationContract()>
+    Function {{VAR_NAME}}_List(ByVal pConexion As String, ByVal pParam As ParamFilter) As DataSet
+
+#End Region
