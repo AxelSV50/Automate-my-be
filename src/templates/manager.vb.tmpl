@@ -117,6 +117,11 @@ Public Class {{CLASS_NAME}}
             Dim _Query As New TQuery(_Transaccion.Conexion)
 {{SELECT_LIST_FIELDS}}
             _Query.From(New TFrom("{{TABLE_NAME}}", "A"))
+
+            '--------ADVERTENCIA CÓDIGO AUTOGENERADO-------- 
+            ' Ajustar parámetros y condiciones según sea necesario, 
+            ' los siguientes son sólo un ejemplo que podría ser erróneo.
+            ' [Borrar este comentario]
 {{LIST_WHERE_EXAMPLE}}
             _Query.OrdenBy(New TField("A", "{{DEFAULT_ORDER_FIELD}}"), TipoOrden.Ascendente)
             If _Query.Open Then

@@ -74,41 +74,54 @@ export default function GeneratorPage() {
   const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
 
   /* ---------- Add attribute with validations ---------- */
-  const addAttribute = () => {
-    const raw = newAttrName.trim();
-    if (!raw) {
-      toast.warn("El nombre del atributo no puede estar vacío");
-      return;
-    }
+const addAttribute = () => {
+  const raw = newAttrName.trim();
+  if (!raw) {
+    toast.warn("El nombre del atributo no puede estar vacío");
+    return;
+  }
 
-    const sanitized = sanitizeColumnName(raw);
-    // duplicate check (case-insensitive)
-    const exists = attributes.some(a => a.name.toLowerCase() === sanitized.toLowerCase());
-    if (exists) {
-      toast.error(`Ya existe un atributo con nombre "${sanitized}"`);
-      return;
-    }
+  const sanitized = sanitizeColumnName(raw);
+  // duplicate check (case-insensitive)
+  const exists = attributes.some(a => a.name.toLowerCase() === sanitized.toLowerCase());
+  if (exists) {
+    toast.error(`Ya existe un atributo con nombre "${sanitized}"`);
+    return;
+  }
 
-    // If adding an identity, ensure only one: prepare the updated array
-    const updated = newIsIdentity ? attributes.map(a => ({ ...a, isIdentity: false })) : [...attributes];
+  // VALIDACIONES NUEVAS PARA IDENTITY:
+  // 1) Si pidió Identity, debe ser PK
+  if (newIsIdentity && !newIsPrimary) {
+    toast.error("No se puede marcar Identity en una columna que no es PK. Marque primero PK.");
+    return;
+  }
+  // 2) Si pidió Identity, el tipo debe ser entero (int, bigint, smallint)
+  const integerTypes = ["int", "bigint", "smallint"];
+  if (newIsIdentity && !integerTypes.includes(newAttrType.toLowerCase())) {
+    toast.error("Identity sólo permitido para tipos enteros: int, bigint, smallint.");
+    return;
+  }
 
-    const newAttr: Attribute = {
-      id: uid(),
-      name: sanitized,
-      type: newAttrType,
-      nullable: false,
-      isPrimary: newIsPrimary,
-      isIdentity: newIsIdentity,
-      columnName: sanitized
-    };
+  // If adding an identity, ensure only one: prepare the updated array
+  const updated = newIsIdentity ? attributes.map(a => ({ ...a, isIdentity: false })) : [...attributes];
 
-    setAttributes([...updated, newAttr]);
-
-    setNewAttrName("");
-    setNewAttrType(COMMON_SQL_TYPES[0]);
-    setNewIsPrimary(false);
-    setNewIsIdentity(false);
+  const newAttr: Attribute = {
+    id: uid(),
+    name: sanitized,
+    type: newAttrType,
+    nullable: false,
+    isPrimary: newIsPrimary,
+    isIdentity: newIsIdentity,
+    columnName: sanitized
   };
+
+  setAttributes([...updated, newAttr]);
+
+  setNewAttrName("");
+  setNewAttrType(COMMON_SQL_TYPES[0]);
+  setNewIsPrimary(false);
+  setNewIsIdentity(false);
+};
 
   /* ---------- Remove attribute ---------- */
   const removeAttribute = (id: string) => {

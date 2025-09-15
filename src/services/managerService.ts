@@ -18,10 +18,8 @@ export function generateManagerFile(data: GeneratorData): { filename: string; co
 
   // INSERT LINES: Into("ColName", New TValue(_Cols.Property))
   const insertLines = cols.map(c => {
-    // For identity columns we may want to call GetNext_Identity for the identity column; skip setting it if DB sets automatically?
-    // We'll generate a rule: if isIdentity and developer wants DB to assign -> skip. But by default we'll set identity by calling GetNext_Identity if flagged.
+
     if (c.isIdentity) {
-      // generate: _Insert.Into("X", New TValue(GetNext_Identity))
       return `            _Insert.Into("${c.columnName}", New TValue(GetNext_Identity))`;
     } else {
       return `            _Insert.Into("${c.columnName}", New TValue(_Cols.${c.name}))`;
@@ -38,32 +36,52 @@ export function generateManagerFile(data: GeneratorData): { filename: string; co
   const wherePkLinesDelete = pkCols.map(c => `            _Delete.Where(New TField("${c.columnName}"), OperadoresFiltros.Igual, New TValue(_Cols.${c.name}))`).join("\n");
   const wherePkLinesListKey = pkCols.map(c => `            _Query.Where(New TField("A", "${c.columnName}"), OperadoresFiltros.Igual, New TValue(_Cols.${c.name}))`).join("\n");
 
-  // SELECT fields (for ListKey - select all columns)
   const selectListKeyFields = cols.map(c => `            _Query.Selected(New TField("A", "${c.columnName}"))`).join("\n");
-  // For List() list fields we can pick some fields; default: first pk as Id, first non-pk text as Description
   const defaultOrderField = (() => {
     const candidate = cols.find(c => c.isPrimary) ?? cols[0];
     return candidate ? candidate.columnName : cols[0].columnName;
   })();
-  const selectListFields = (() => {
-    // example: select Id (first pk or first col), Description (first varchar/text) and Sigla if exists...
-    const idField = cols.find(c => c.isPrimary) ?? cols[0];
-    const descField = cols.find(c => /char|text|varchar|nvarchar/i.test(c.type)) ?? cols.find(c => !c.isPrimary);
-    const otherFields = cols.filter(c => c !== idField && c !== descField).slice(0, 2);
-    const lines: string[] = [];
-    if (idField) lines.push(`            _Query.Selected(New TField("A", "${idField.columnName}", "Id"))`);
-    if (descField) lines.push(`            _Query.Selected(New TField("A", "${descField.columnName}", "Descripcion"))`);
-    otherFields.forEach(of => lines.push(`            _Query.Selected(New TField("A", "${of.columnName}", "${of.columnName}"))`));
-    return lines.join("\n");
-  })();
+ const selectListFields = (() => {
 
-  // LIST WHERE example (Param usage): a small example with Param.Empresa and TipoFiltro/Nombre/Id - developer should adjust
-  const listWhereExample = `            _Query.Where(New TField("A", "${pkCols[0]?.columnName ?? cols[0].columnName}"), OperadoresFiltros.Igual, New TValue(Param.Empresa))
+  const idField = cols.find(c => c.isPrimary && !c.isIdentity) ?? cols.find(c => c.isPrimary) ?? cols[0];
+  const otherFields = cols.filter(c => c.columnName !== (idField?.columnName ?? ""));
+  const lines: string[] = [];
+
+  if (idField) {
+    lines.push(`            _Query.Selected(New TField("A", "${idField.columnName}", "${idField.columnName}"))`);
+  }
+
+  otherFields.forEach(of => {
+    lines.push(`            _Query.Selected(New TField("A", "${of.columnName}", "${of.columnName}"))`);
+  });
+
+  return lines.join("\n");
+})();
+
+const firstNonIdentityPk = (pkCols.find(c => !c.isIdentity) ?? pkCols[0] ?? cols[0]);
+const identityPk = (pkCols.find(c => c.isIdentity) ?? pkCols[0] ?? cols[0]);
+const textCol = (cols.find(c => /char|text|varchar|nvarchar/i.test(c.type)) ?? firstNonIdentityPk ?? cols[0]);
+
+const hasMultiplePK = (pkCols.length > 1);
+
+let listWhereExample = "";
+
+if (hasMultiplePK) {
+  // Cuando hay más de una PK
+  listWhereExample = `
+            _Query.Where(New TField("A", "${firstNonIdentityPk.columnName}"), OperadoresFiltros.Igual, New TValue(Param.Empresa))
             If Param.TipoFiltro = TParam.Nombre Then 'Por Nombre
-                _Query.Where(New TField("A", "${(cols.find(c => /char|text|varchar|nvarchar/i.test(c.type))?.columnName) ?? pkCols[0]?.columnName ?? cols[0].columnName}"), OperadoresFiltros.Parecido, New TConjunto(Param.Nombre))
+                _Query.Where(New TField("A", "${textCol.columnName}"), OperadoresFiltros.Parecido, New TConjunto(Param.Nombre))
             ElseIf Param.TipoFiltro = TParam.Codigo Then 'Por Codigo
-                _Query.Where(New TField("A", "${pkCols[0]?.columnName ?? cols[0].columnName}"), OperadoresFiltros.Igual, New TValue(Param.Id))
+                _Query.Where(New TField("A", "${identityPk.columnName}"), OperadoresFiltros.Igual, New TValue(Param.Id))
             End If`;
+} else {
+  //Cuando sólo hay una PK no tiene sentido la condición inicial ni el filtro por Código
+  listWhereExample = `
+            If Param.TipoFiltro = TParam.Nombre Then 'Por Nombre
+                _Query.Where(New TField("A", "${textCol.columnName}"), OperadoresFiltros.Parecido, New TConjunto(Param.Nombre))
+            End If`;
+}
 
   // RECORD_LOAD lines: _Cols.Prop = .Item("ColName")
   const recordLoadLines = cols.map(c => `            _Cols.${c.name} = .Item("${c.columnName}")`).join("\n");
