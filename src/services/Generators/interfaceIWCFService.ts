@@ -1,7 +1,7 @@
-import type { GeneratorData } from "../types/dtos";
-import interfaceTemplate from "../templates/interfaceIWCF.vb.tmpl?raw";
-import { mapSqlTypeToVBType } from "./vbHelpers";
-import { sanitizeIdentifier } from "./vbHelpers";
+import type { GeneratorData } from "../../types/dtos";
+import interfaceTemplate from "../../templates/interfaceIWCF.vb.tmpl?raw";
+import { mapSqlTypeToVBType } from "../vbHelpers";
+import { sanitizeIdentifier } from "../vbHelpers";
 
 export function generateInterfaceIWCFFragment(data: GeneratorData): { title: string; filename: string; content: string; description: string } {
   const rawTable = data.tableName ?? "MyTable";
@@ -15,10 +15,10 @@ export function generateInterfaceIWCFFragment(data: GeneratorData): { title: str
     .join("");
   const regClassName = `TReg${classBase}`;
 
-  // PK columns
+  // PKs
   const pkCols = (data.attributes ?? []).filter(a => !!a.isPrimary);
 
-  // Construir PK params signature: ", ByVal pEmp_id As Integer, ByVal pAccion_id As Integer"
+  // Construir PK params: ", ByVal pEmp_id As Integer, ByVal pAccion_id As Integer"
   const pkParamsParts = pkCols.map(c => {
     const col = c.columnName ?? c.name;
     const vbType = mapSqlTypeToVBType(c.type);

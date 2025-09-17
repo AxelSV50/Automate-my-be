@@ -1,7 +1,9 @@
 export function sanitizeIdentifier(s: string): string {
   if (!s) return s;
-  //Trim, reemplazar espacios por _, eliminar caracteres distintos de letra/dígito/_ y conservar mayúsculas/minúsculas
+  //Trim, reemplazar espacios por _, eliminar caracteres distintos de letra/dígito/_ 
+  // conservar mayusculas/minusculas
   let out = s.trim().replace(/\s+/g, "_").replace(/[^\w]/g, "");
+
   //Evitar que empiece con dígito
   if (/^\d/.test(out)) out = "F_" + out;
   if (out.length === 0) out = "_";

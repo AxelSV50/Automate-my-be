@@ -1,8 +1,9 @@
-import type { GeneratorData } from "../types/dtos";
-import managerTemplate from "../templates/manager.vb.tmpl?raw";
-import { sanitizeIdentifier } from "./vbHelpers";
+import type { GeneratorData } from "../../types/dtos";
+import managerTemplate from "../../templates/manager.vb.tmpl?raw";
+import { sanitizeIdentifier } from "../vbHelpers";
 
 export function generateManagerFile(data: GeneratorData): { filename: string; content: string; description: string } {
+
   const tableName = data.tableName;
   const className = sanitizeIdentifier("T" + tableName.replace(/\s+/g, ""));
   const cols = data.attributes.map(a => ({ ...a, columnName: a.columnName ?? a.name }));
@@ -16,7 +17,8 @@ export function generateManagerFile(data: GeneratorData): { filename: string; co
   // PROPERTIES (Col property)
   const properties = `    Public Property Col() As TReg${sanitizeIdentifier(tableName)}\n        Get\n            Return _Cols\n        End Get\n        Set(ByVal Value As TReg${sanitizeIdentifier(tableName)})\n            _Cols = Value\n        End Set\n    End Property`;
 
-  // INSERT LINES: Into("ColName", New TValue(_Cols.Property))
+
+  // INSERT: Into("ColName", New TValue(_Cols.Property))
   const insertLines = cols.map(c => {
 
     if (c.isIdentity) {
@@ -26,7 +28,7 @@ export function generateManagerFile(data: GeneratorData): { filename: string; co
     }
   }).join("\n");
 
-  // UPDATE SET lines (skip identity and skip PK fields)
+  // UPDATE 
   const nonPkNonIdentity = cols.filter(c => !c.isPrimary && !c.isIdentity);
   const updateSetLines = nonPkNonIdentity.map(c => `            _Update.SetValue("${c.columnName}", New TValue(_Cols.${c.name}))`).join("\n");
 
@@ -67,7 +69,8 @@ const hasMultiplePK = (pkCols.length > 1);
 let listWhereExample = "";
 
 if (hasMultiplePK) {
-  // Cuando hay más de una PK
+
+  //CUANDO HAY MAS DE UNA PK
   listWhereExample = `
             _Query.Where(New TField("A", "${firstNonIdentityPk.columnName}"), OperadoresFiltros.Igual, New TValue(Param.Empresa))
             If Param.TipoFiltro = TParam.Nombre Then 'Por Nombre
@@ -76,23 +79,26 @@ if (hasMultiplePK) {
                 _Query.Where(New TField("A", "${identityPk.columnName}"), OperadoresFiltros.Igual, New TValue(Param.Id))
             End If`;
 } else {
-  //Cuando sólo hay una PK no tiene sentido la condición inicial ni el filtro por Código
+  //CUANDO SOLO HAY UNA PK NO VALE LA PENA HACER EL FILTRO
   listWhereExample = `
             If Param.TipoFiltro = TParam.Nombre Then 'Por Nombre
                 _Query.Where(New TField("A", "${textCol.columnName}"), OperadoresFiltros.Parecido, New TConjunto(Param.Nombre))
             End If`;
 }
 
-  // RECORD_LOAD lines: _Cols.Prop = .Item("ColName")
+  // RECORD_LOAD: _Cols.Prop = .Item("ColName")
   const recordLoadLines = cols.map(c => `            _Cols.${c.name} = .Item("${c.columnName}")`).join("\n");
 
-  // GET_NEXT_IDENTITY: if there's any identity column, produce the logic similar to example: Max(identity) filtered by other PKs
+  // GET_NEXT_IDENTITY: CUANDO HAY UNA COLUMNA MARCADA COMO ID
   const identityCol = cols.find(c => c.isIdentity);
-  let getNextIdentitySnippet = `        ' No identity column defined - adjust if needed\n        Return 1`;
+  let getNextIdentitySnippet = `        ' SIN COLUMNAS IDENTITY\n        Return 1`;
+
   if (identityCol) {
-    // build where clauses: for each pk except identityCol itself, add Where(New TField("A","col"),..., New TValue(_Cols.col))
+
+    //WHERE
     const otherPkCols = cols.filter(c => c.isPrimary && c.columnName !== identityCol.columnName);
     const whereLines = otherPkCols.map(c => `        _Query.Where(New TField("A", "${c.columnName}"), OperadoresFiltros.Igual, New TValue(_Cols.${c.name}))`).join("\n");
+    
     getNextIdentitySnippet = `        Dim _Query As New TQuery(_Transaccion.Conexion)
         _Query.Selected(New TMax(New TField("A", "${identityCol.columnName}"), "Maximo"))
         _Query.From(New TFrom("${tableName}", "A"))
@@ -107,7 +113,7 @@ ${whereLines ? whereLines + "\n" : ""}        If _Query.Open Then
         End If`;
   }
 
-  // Compose final content by replacing tokens
+  // REEMPLAZAR LOS TOKENS
   const content = managerTemplate
     .replace(/{{TABLE_NAME}}/g, tableName)
     .replace(/{{CLASS_NAME}}/g, className)

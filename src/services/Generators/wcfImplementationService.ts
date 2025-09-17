@@ -1,12 +1,12 @@
-import type { GeneratorData } from "../types/dtos";
-import tmpl from "../templates/wcfImplementation.vb.tmpl?raw";
-import { mapSqlTypeToVBType, sanitizeIdentifier } from "./vbHelpers";
+import type { GeneratorData } from "../../types/dtos";
+import tmpl from "../../templates/wcfImplementation.vb.tmpl?raw";
+import { mapSqlTypeToVBType, sanitizeIdentifier } from "../vbHelpers";
 
 export function generateWcfImplementationFragment(data: GeneratorData): { title: string; filename: string; content: string; description: string } {
   const rawTable = data.tableName ?? "MyTable";
-  const varName = rawTable; // mantiene underscore (ej. Codigo_Accion)
+  const varName = rawTable; // mantiene underscore
 
-  // CLASS_BASE en Pascal (CodigoAccion)
+  // CLASS_BASE en Pascal 
   const classBase = rawTable
     .replace(/[^a-zA-Z0-9]+/g, " ")
     .split(/\s+/)
@@ -15,10 +15,10 @@ export function generateWcfImplementationFragment(data: GeneratorData): { title:
 
   const regClassName = `TReg${classBase}`;
 
-  // PK columns
+  // PKs
   const pkCols = (data.attributes ?? []).filter(a => !!a.isPrimary);
 
-  // PK params signature: ", ByVal pEmp_id As Integer, ByVal pAccion_id As Integer"
+  // ARGS CONEXION
   const pkParamsParts = pkCols.map(c => {
     const col = c.columnName ?? c.name;
     const vbType = mapSqlTypeToVBType(c.type);
@@ -26,11 +26,11 @@ export function generateWcfImplementationFragment(data: GeneratorData): { title:
   });
   const pkParamsSignature = pkParamsParts.length > 0 ? `, ${pkParamsParts.join(", ")}` : "";
 
-  // PK args list for calls: ", pEmp_id, pAccion_id" (leading comma if any)
+  // ARGUMENTOS: ", pEmp_id, pAccion_id"
   const pkArgNames = pkCols.map(c => `p${(c.columnName ?? c.name)}`);
   const pkArgsList = pkArgNames.length > 0 ? `, ${pkArgNames.join(", ")}` : "";
 
-  // Determine selected category/class to call. Default to "Catalogo"
+  // DETERMINAR LA CATEGORÍA
   const rawCategory = (data.category ?? "Catalogo").toString();
   const selectedBase = rawCategory.replace(/^T/i, "").replace(/\.vb$/i, "").replace(/[^A-Za-z0-9]/g, "");
   const callerBase = selectedBase || "Catalogo";              
@@ -38,7 +38,7 @@ export function generateWcfImplementationFragment(data: GeneratorData): { title:
   const callerClass = `T${callerBase}`;                       
   const interfaceName = `IWCF${callerBase}`;                
 
-  // Build content replacing template tokens (direct token replacement)
+  // REEMPLAZAR LOS TOKENS
   let content = tmpl
     .replace(/{{VAR_NAME}}/g, varName)
     .replace(/{{CLASS_BASE}}/g, classBase)

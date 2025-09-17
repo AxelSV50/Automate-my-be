@@ -1,6 +1,6 @@
-import type { GeneratorData } from "../types/dtos";
-import controlBusinessTemplate from "../templates/controlBusiness.vb.tmpl?raw";
-import { mapSqlTypeToVBType } from "./vbHelpers";
+import type { GeneratorData } from "../../types/dtos";
+import controlBusinessTemplate from "../../templates/controlBusiness.vb.tmpl?raw";
+import { mapSqlTypeToVBType } from "../vbHelpers";
 
 
 export function generateControlBusinessFragment(data: GeneratorData): { title: string; filename: string; content: string; description: string} {

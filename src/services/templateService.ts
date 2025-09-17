@@ -1,9 +1,9 @@
 import type { GeneratorData } from "../types/dtos";
-import { generateManagerFile } from "./managerService";
-import { generateEntityFile } from "./entityService";
-import { generateControlBusinessFragment } from "./controlBusinessService";
-import { generateInterfaceIWCFFragment } from "./interfaceIWCFService";
-import { generateWcfImplementationFragment } from "./wcfImplementationService";
+import { generateManagerFile } from "./Generators/managerService";
+import { generateEntityFile } from "./Generators/entityService";
+import { generateControlBusinessFragment } from "./Generators/controlBusinessService";
+import { generateInterfaceIWCFFragment } from "./Generators/interfaceIWCFService";
+import { generateWcfImplementationFragment } from "./Generators/wcfImplementationService";
 
 export type GeneratedUnit = {
   filename: string;

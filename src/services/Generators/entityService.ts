@@ -3,9 +3,9 @@ import {
   privateVarName,
   mapSqlTypeToVBType,
   defaultValueForVB
-} from "./vbHelpers";
-import entityTemplate from "../templates/entity.vb.tmpl?raw";
-import type { GeneratorData } from "../types/dtos";
+} from "../vbHelpers";
+import entityTemplate from "../../templates/entity.vb.tmpl?raw";
+import type { GeneratorData } from "../../types/dtos";
 
 export function generateEntityFile(data: GeneratorData): { filename: string; content: string, description: string } {
   const tableName = sanitizeIdentifier(data.tableName);
