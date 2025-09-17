@@ -41,8 +41,13 @@ export default function GeneratorPage() {
 
       <div style={{ paddingLeft: "17px" }}>
         <Text style={{ color: "#8b8b8bff", fontFamily: "monospace" }}>
-          Crea un CRUD funcional en menos de 1s, siguiendo los estándares de LD. 
-          <br/>Sólo descarga/copia cada snippet en la ubicación indicada al expandir los archivos generados.
+          Crea un {" "}
+          <Text underline style={{ color: "#aaaaaaff", fontFamily: "monospace" }}>
+            CRUD funcional en menos de 1s
+          </Text>
+          , siguiendo los estándares de LD.
+          <br />
+          Sólo descarga/copia cada snippet en la ubicación indicada al expandir los archivos generados.
         </Text>
       </div>
       <br/>
