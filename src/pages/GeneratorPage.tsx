@@ -35,7 +35,7 @@ export default function GeneratorPage() {
       <Title level={2} style={{ color: "#fff", paddingLeft: "15px", fontFamily: "monospace" }}>
         GENERADOR DE NEGOCIO - LDCREDIT
         <Text style={{ color: "#8b8b8bff", fontFamily: "monospace", paddingLeft:"10px" }}>
-              (v 0.0.3)
+              (v 0.0.4)
         </Text>
       </Title>
 
