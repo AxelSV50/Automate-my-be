@@ -4,7 +4,7 @@ import { mapSqlTypeToVBType } from "../vbHelpers";
 import { sanitizeIdentifier } from "../vbHelpers";
 
 export function generateInterfaceIWCFFragment(data: GeneratorData): { title: string; filename: string; content: string; description: string } {
-  const rawTable = data.tableName ?? "MyTable";
+  const rawTable = data.tableName.replaceAll("_", "") ?? "MyTable";
   // VAR_NAME mantiene el nombre original (Codigo_Accion)
   const varName = rawTable;
   // REG_CLASS_NAME: TReg + Camel/Pascal de la tabla para el tipo de datos

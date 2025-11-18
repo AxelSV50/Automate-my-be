@@ -4,7 +4,7 @@ import { mapSqlTypeToVBType } from "../vbHelpers";
 
 
 export function generateControlBusinessFragment(data: GeneratorData): { title: string; filename: string; content: string; description: string} {
-  const rawTable = data.tableName ?? "MyTable";
+  const rawTable = data.tableName.replaceAll("_", "") ?? "MyTable";
   // CLASS_BASE: PascalCase sin guiones bajos (Codigo_Accion -> CodigoAccion)
   const classBase = rawTable
     .replace(/[^a-zA-Z0-9]+/g, " ")

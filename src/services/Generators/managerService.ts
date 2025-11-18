@@ -9,13 +9,13 @@ export function generateManagerFile(data: GeneratorData): { filename: string; co
   const cols = data.attributes.map(a => ({ ...a, columnName: a.columnName ?? a.name }));
 
   // VARIABLES (private)
-  const variables = `    Private _Cols As ${"TReg" + sanitizeIdentifier(tableName)}`;
+  const variables = `    Private _Cols As ${"TReg" + sanitizeIdentifier(tableName).replaceAll("_", "")}`;
 
   // CONSTRUCTOR INITS
-  const constructorInits = `        _Cols = New TReg${sanitizeIdentifier(tableName)}`;
+  const constructorInits = `        _Cols = New TReg${sanitizeIdentifier(tableName).replaceAll("_", "")}`;
 
   // PROPERTIES (Col property)
-  const properties = `    Public Property Col() As TReg${sanitizeIdentifier(tableName)}\n        Get\n            Return _Cols\n        End Get\n        Set(ByVal Value As TReg${sanitizeIdentifier(tableName)})\n            _Cols = Value\n        End Set\n    End Property`;
+  const properties = `    Public Property Col() As TReg${sanitizeIdentifier(tableName).replaceAll("_", "")}\n        Get\n            Return _Cols\n        End Get\n        Set(ByVal Value As TReg${sanitizeIdentifier(tableName.replaceAll("_", ""))})\n            _Cols = Value\n        End Set\n    End Property`;
 
 
   // INSERT: Into("ColName", New TValue(_Cols.Property))
@@ -116,7 +116,7 @@ ${whereLines ? whereLines + "\n" : ""}        If _Query.Open Then
   // REEMPLAZAR LOS TOKENS
   const content = managerTemplate
     .replace(/{{TABLE_NAME}}/g, tableName)
-    .replace(/{{CLASS_NAME}}/g, className)
+    .replace(/{{CLASS_NAME}}/g, className.replaceAll("_", ""))
     .replace("{{VARIABLES}}", variables)
     .replace("{{CONSTRUCTOR_INITS}}", constructorInits)
     .replace("{{PROPERTIES}}", properties)
@@ -135,7 +135,7 @@ ${whereLines ? whereLines + "\n" : ""}        If _Query.Open Then
     const description = "Clase de DAL que se comunica con la Base de Datos. Colocar archivo en proyecto "+ "'"+data.category+ "'.";
 
   return {
-    filename: `${className}.vb`,
+    filename: `${className.replaceAll("_", "")}.vb`,
     content,
     description
   };

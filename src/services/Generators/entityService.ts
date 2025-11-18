@@ -9,7 +9,7 @@ import type { GeneratorData } from "../../types/dtos";
 
 export function generateEntityFile(data: GeneratorData): { filename: string; content: string, description: string } {
   const tableName = sanitizeIdentifier(data.tableName);
-  const className = `TReg${tableName}`;
+  const className = `TReg${tableName.replaceAll("_", "")}`;
   const attrs = data.attributes.map(a => ({ ...a }));
 
   const VARIABLES = attrs.length > 0

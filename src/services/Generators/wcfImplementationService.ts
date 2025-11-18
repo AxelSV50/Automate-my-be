@@ -3,8 +3,8 @@ import tmpl from "../../templates/wcfImplementation.vb.tmpl?raw";
 import { mapSqlTypeToVBType, sanitizeIdentifier } from "../vbHelpers";
 
 export function generateWcfImplementationFragment(data: GeneratorData): { title: string; filename: string; content: string; description: string } {
-  const rawTable = data.tableName ?? "MyTable";
-  const varName = rawTable; // mantiene underscore
+  const rawTable = data.tableName.replaceAll("_", "") ?? "MyTable";
+  const varName = rawTable; 
 
   // CLASS_BASE en Pascal 
   const classBase = rawTable
